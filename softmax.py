@@ -42,9 +42,10 @@ b = tf.Variable(tf.zeros([10]))
 # Model definition
 y = tf.nn.softmax(tf.matmul(x, W) + b)
 
-# Cost function definition
+# Definition of the variable for the target values
 y_ = tf.placeholder(tf.float32, [None, 10])
-#cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y), reduction_indices=[1]))
+
+# Cost function definition
 cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=y))
 
 # Define the optimisation algorithm
