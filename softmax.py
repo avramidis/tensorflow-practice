@@ -22,3 +22,15 @@ axarr[1][1].imshow(numpy.reshape(mnist.train.images[r+3], (28, 28)))
 axarr[1][1].set_title(numpy.where(mnist.train.labels[r+3]==1)[0][0])
 f.subplots_adjust(hspace=0.3)
 plt.show(block=True)
+
+# Input variable definition and initialisation
+x = tf.placeholder(tf.float32, [None, 784])
+
+# Weights variable definition and initialisation
+W = tf.Variable(tf.zeros([784, 10]))
+
+# Bias variable definition and initialisation
+b = tf.Variable(tf.zeros([10]))
+
+# Model definition
+y = tf.nn.softmax(tf.matmul(x, W) + b)
