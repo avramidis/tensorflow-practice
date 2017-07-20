@@ -40,32 +40,35 @@ with tf.name_scope('Model'):
 
 with tf.name_scope('Loss'):
     # Cost function definition
-    cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y, logits=pred))
+    cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y, logits=pred))
 
 with tf.name_scope('Optimiser'):
     # Define the optimisation algorithm
-    train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(cross_entropy)
+    optimiser = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost)
 
 with tf.name_scope('Accuracy'):
     # Model evaluation
     correct_prediction = tf.equal(tf.argmax(pred,1), tf.argmax(y,1))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
-# Define and initilise a TensorFlow session
-sess = tf.InteractiveSession()
-tf.global_variables_initializer().run()
+# Initialise the variables
+init = tf.global_variables_initializer()
 
-summary_writer = tf.summary.FileWriter(logs_path, sess.graph)
-tf.summary.scalar("cross_entropy", cross_entropy)
-
+# Add summary data to monitor the optimisation of the model
+tf.summary.scalar("cost", cost)
+tf.summary.scalar("accuracy", accuracy)
 merged_summary_op = tf.summary.merge_all()
 print("Summary information defined.")
 
-# Train the model
-for i in range(training_epochs):
-  batch_xs, batch_ys = mnist.train.next_batch(batch_size)
-  _, l, summary = sess.run([train_step, cross_entropy, merged_summary_op], feed_dict={x: batch_xs, y: batch_ys})
-  summary_writer.add_summary(summary, i)
+with tf.Session() as sess:
+    sess.run(init)
 
+    summary_writer = tf.summary.FileWriter(logs_path, sess.graph)
 
-print("Classification accuracy for the test data set: " + str(sess.run(accuracy, feed_dict={x: mnist.test.images, y: mnist.test.labels})))
+    # Train the model
+    for i in range(training_epochs):
+      batch_xs, batch_ys = mnist.train.next_batch(batch_size)
+      _, l, summary = sess.run([optimiser, cost, merged_summary_op], feed_dict={x: batch_xs, y: batch_ys})
+      summary_writer.add_summary(summary, i)
+
+    print("Classification accuracy for the test data set: " + str(sess.run(accuracy, feed_dict={x: mnist.test.images, y: mnist.test.labels})))
