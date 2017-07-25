@@ -6,11 +6,11 @@ import matplotlib.pyplot as plt
 import numpy
 import random
 
+# def trainevalmodel(training_epochs, learning_rate, batch_size):
 # Parameters
-learning_rate = 0.05
+learning_rate = 1.5
 training_epochs = 2000
 batch_size = 100
-display_step = 1
 logs_path = 'logs'
 
 # Set the logs folder and delete any files in it
@@ -55,20 +55,25 @@ with tf.name_scope('Accuracy'):
 init = tf.global_variables_initializer()
 
 # Add summary data to monitor the optimisation of the model
-tf.summary.scalar("cost", cost)
-tf.summary.scalar("accuracy", accuracy)
-merged_summary_op = tf.summary.merge_all()
-print("Summary information defined.")
+# tf.summary.scalar("cost", cost)
+# tf.summary.scalar("accuracy", accuracy)
+# merged_summary_op = tf.summary.merge_all()
+# print("Summary information defined.")
 
 with tf.Session() as sess:
     sess.run(init)
 
-    summary_writer = tf.summary.FileWriter(logs_path, sess.graph)
+    # summary_writer = tf.summary.FileWriter(logs_path, sess.graph)
 
     # Train the model
     for i in range(training_epochs):
       batch_xs, batch_ys = mnist.train.next_batch(batch_size)
-      _, l, summary = sess.run([optimiser, cost, merged_summary_op], feed_dict={x: batch_xs, y: batch_ys})
-      summary_writer.add_summary(summary, i)
+      #_, l, summary = sess.run([optimiser, cost, merged_summary_op], feed_dict={x: batch_xs, y: batch_ys})
+      _, l = sess.run([optimiser, cost], feed_dict={x: batch_xs, y: batch_ys})
 
-    print("Classification accuracy for the test data set: " + str(sess.run(accuracy, feed_dict={x: mnist.test.images, y: mnist.test.labels})))
+    #   summary_writer.add_summary(summary, i)
+
+    finalaccuracy = sess.run(accuracy, feed_dict={x: mnist.test.images, y: mnist.test.labels})
+    print("Classification accuracy for the test data set: " + str(finalaccuracy))
+
+# return finalaccuracy
