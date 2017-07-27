@@ -113,4 +113,8 @@ with tf.Session() as sess:
       x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
 
 end_time = time.time()
-print(end_time - start_time)
+total_time = end_time - start_time
+print("Runtime: " + str(total_time) + " seconds.")
+
+print("Enter to the command line the following: tensorboard --logdir=" + logs_path)
+print("Using an internet browser navigate to: http://localhost:6006")
