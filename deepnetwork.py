@@ -31,12 +31,6 @@ x = tf.placeholder(tf.float32, [None, 784], name='InputData')
 # Definition of the variable for the target values
 y_ = tf.placeholder(tf.float32, [None, 10], name='LabelData')
 
-# # Weights variable definition and initialisation
-# W = tf.Variable(tf.zeros([784, 10]), name='Weights')
-#
-# # Bias variable definition and initialisation
-# b = tf.Variable(tf.zeros([10]), name='Bias')
-
 def weight_variable(shape):
   initial = tf.truncated_normal(shape, stddev=0.1)
   return tf.Variable(initial)
@@ -53,52 +47,53 @@ def max_pool_2x2(x):
                         strides=[1, 2, 2, 1], padding='SAME')
 
 
-# with tf.name_scope('Model'):
-# First Convolutional Layer
+with tf.name_scope('Model'):
+    # First Convolutional Layer
+    W_conv1 = weight_variable([5, 5, 1, 32])
+    b_conv1 = bias_variable([32])
 
-W_conv1 = weight_variable([5, 5, 1, 32])
-b_conv1 = bias_variable([32])
+    x_image = tf.reshape(x, [-1, 28, 28, 1])
 
-x_image = tf.reshape(x, [-1, 28, 28, 1])
+    h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
+    h_pool1 = max_pool_2x2(h_conv1)
 
-h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
-h_pool1 = max_pool_2x2(h_conv1)
+    # Second Convolutional Layer
+    W_conv2 = weight_variable([5, 5, 32, 64])
+    b_conv2 = bias_variable([64])
 
-# Second Convolutional Layer
+    h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
+    h_pool2 = max_pool_2x2(h_conv2)
 
-W_conv2 = weight_variable([5, 5, 32, 64])
-b_conv2 = bias_variable([64])
+    # Densely Connected Layer
+    W_fc1 = weight_variable([7 * 7 * 64, 1024])
+    b_fc1 = bias_variable([1024])
 
-h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
-h_pool2 = max_pool_2x2(h_conv2)
+    h_pool2_flat = tf.reshape(h_pool2, [-1, 7*7*64])
+    h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
-# Densely Connected Layer
+    # Dropout
+    keep_prob = tf.placeholder(tf.float32)
+    h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
 
-W_fc1 = weight_variable([7 * 7 * 64, 1024])
-b_fc1 = bias_variable([1024])
+    # Readout Layer
+    W_fc2 = weight_variable([1024, 10])
+    b_fc2 = bias_variable([10])
 
-h_pool2_flat = tf.reshape(h_pool2, [-1, 7*7*64])
-h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
+    y_conv = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
 
-# Dropout
+with tf.name_scope('Loss'):
+    # Cost function definition
+    cross_entropy = tf.reduce_mean(
+        tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=y_conv))
 
-keep_prob = tf.placeholder(tf.float32)
-h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
+with tf.name_scope('Optimiser'):
+    # Model optimisation
+    train_step = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy)
 
-# Readout Layer
-
-W_fc2 = weight_variable([1024, 10])
-b_fc2 = bias_variable([10])
-
-y_conv = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
-
-# Train and Evaluate the Model
-
-cross_entropy = tf.reduce_mean(
-    tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=y_conv))
-train_step = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy)
-correct_prediction = tf.equal(tf.argmax(y_conv, 1), tf.argmax(y_, 1))
-accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+with tf.name_scope('Accuracy'):
+    # Model evaluation
+    correct_prediction = tf.equal(tf.argmax(y_conv, 1), tf.argmax(y_, 1))
+    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
 # Add summary data to monitor the optimisation of the model
 tf.summary.scalar("cost", cross_entropy)
