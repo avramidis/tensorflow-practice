@@ -33,11 +33,11 @@ y_ = tf.placeholder(tf.float32, [None, 10], name='LabelData')
 
 def weight_variable(shape):
   initial = tf.truncated_normal(shape, stddev=0.1)
-  return tf.Variable(initial)
+  return tf.Variable(initial, name='Weights')
 
 def bias_variable(shape):
   initial = tf.constant(0.1, shape=shape)
-  return tf.Variable(initial)
+  return tf.Variable(initial, name='Bias')
 
 def conv2d(x, W):
   return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
@@ -48,11 +48,11 @@ def max_pool_2x2(x):
 
 
 with tf.name_scope('Model'):
+    x_image = tf.reshape(x, [-1, 28, 28, 1])
+
     # First Convolutional Layer
     W_conv1 = weight_variable([5, 5, 1, 32])
     b_conv1 = bias_variable([32])
-
-    x_image = tf.reshape(x, [-1, 28, 28, 1])
 
     h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
     h_pool1 = max_pool_2x2(h_conv1)
