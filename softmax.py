@@ -9,7 +9,6 @@ import time
 
 start_time = time.time()
 
-# def trainevalmodel(training_epochs, learning_rate, batch_size):
 # Parameters
 learning_rate = 1.5
 training_epochs = 2000
@@ -72,7 +71,6 @@ with tf.Session() as sess:
     for i in range(training_epochs):
       batch_xs, batch_ys = mnist.train.next_batch(batch_size)
       _, l, summary = sess.run([optimiser, cost, merged_summary_op], feed_dict={x: batch_xs, y: batch_ys})
-      #_, l = sess.run([optimiser, cost], feed_dict={x: batch_xs, y: batch_ys})
 
       summary_writer.add_summary(summary, i)
 
