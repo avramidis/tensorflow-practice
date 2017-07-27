@@ -5,6 +5,9 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy
 import random
+import time
+
+start_time = time.time()
 
 # def trainevalmodel(training_epochs, learning_rate, batch_size):
 # Parameters
@@ -55,25 +58,27 @@ with tf.name_scope('Accuracy'):
 init = tf.global_variables_initializer()
 
 # Add summary data to monitor the optimisation of the model
-# tf.summary.scalar("cost", cost)
-# tf.summary.scalar("accuracy", accuracy)
-# merged_summary_op = tf.summary.merge_all()
-# print("Summary information defined.")
+tf.summary.scalar("cost", cost)
+tf.summary.scalar("accuracy", accuracy)
+merged_summary_op = tf.summary.merge_all()
+print("Summary information defined.")
 
 with tf.Session() as sess:
     sess.run(init)
 
-    # summary_writer = tf.summary.FileWriter(logs_path, sess.graph)
+    summary_writer = tf.summary.FileWriter(logs_path, sess.graph)
 
     # Train the model
     for i in range(training_epochs):
       batch_xs, batch_ys = mnist.train.next_batch(batch_size)
-      #_, l, summary = sess.run([optimiser, cost, merged_summary_op], feed_dict={x: batch_xs, y: batch_ys})
-      _, l = sess.run([optimiser, cost], feed_dict={x: batch_xs, y: batch_ys})
+      _, l, summary = sess.run([optimiser, cost, merged_summary_op], feed_dict={x: batch_xs, y: batch_ys})
+      #_, l = sess.run([optimiser, cost], feed_dict={x: batch_xs, y: batch_ys})
 
-    #   summary_writer.add_summary(summary, i)
+      summary_writer.add_summary(summary, i)
 
     finalaccuracy = sess.run(accuracy, feed_dict={x: mnist.test.images, y: mnist.test.labels})
     print("Classification accuracy for the test data set: " + str(finalaccuracy))
 
-# return finalaccuracy
+end_time = time.time()
+total_time = end_time - start_time
+print("Runtime: " + str(total_time) + " seconds.")
