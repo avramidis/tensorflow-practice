@@ -53,6 +53,7 @@ def max_pool_2x2(x):
                         strides=[1, 2, 2, 1], padding='SAME')
 
 
+# with tf.name_scope('Model'):
 # First Convolutional Layer
 
 W_conv1 = weight_variable([5, 5, 1, 32])
@@ -99,15 +100,31 @@ train_step = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy)
 correct_prediction = tf.equal(tf.argmax(y_conv, 1), tf.argmax(y_, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
+# Add summary data to monitor the optimisation of the model
+tf.summary.scalar("cost", cross_entropy)
+tf.summary.scalar("accuracy", accuracy)
+merged_summary_op = tf.summary.merge_all()
+print("Summary information defined.")
+
 with tf.Session() as sess:
   sess.run(tf.global_variables_initializer())
+
+  summary_writer = tf.summary.FileWriter(logs_path, sess.graph)
+
+
   for i in range(training_epochs):
     batch = mnist.train.next_batch(batch_size)
+
     if i % display_step == 0:
       train_accuracy = accuracy.eval(feed_dict={
           x: batch[0], y_: batch[1], keep_prob: 1.0})
       print('step %d, training accuracy %g' % (i, train_accuracy))
-    train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
+
+    #train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
+
+    _, l, summary = sess.run([train_step, cross_entropy, merged_summary_op], feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
+
+    summary_writer.add_summary(summary, i)
 
   print('test accuracy %g' % accuracy.eval(feed_dict={
       x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
