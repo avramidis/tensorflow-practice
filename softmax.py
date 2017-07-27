@@ -82,3 +82,6 @@ with tf.Session() as sess:
 end_time = time.time()
 total_time = end_time - start_time
 print("Runtime: " + str(total_time) + " seconds.")
+
+print("Ended to the command line the following command:/n tensorboard --logdir=logs")
+print("Using an internet browser navigate to http://localhost:6006")
