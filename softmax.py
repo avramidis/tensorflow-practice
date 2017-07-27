@@ -10,8 +10,8 @@ import time
 start_time = time.time()
 
 # Parameters
-learning_rate = 1.5
-training_epochs = 2000
+learning_rate = 0.001
+training_epochs = 6000
 batch_size = 100
 logs_path = 'logs'
 
@@ -46,7 +46,8 @@ with tf.name_scope('Loss'):
 
 with tf.name_scope('Optimiser'):
     # Define the optimisation algorithm
-    optimiser = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost)
+    #optimiser = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost)
+    optimiser = tf.train.AdamOptimizer(learning_rate).minimize(cost)
 
 with tf.name_scope('Accuracy'):
     # Model evaluation
