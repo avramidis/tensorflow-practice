@@ -33,6 +33,11 @@ print(node_add_1, node_add_2)
 node_var_1 = tf.Variable(1, dtype=tf.float32)
 node_var_2 = tf.Variable(2, dtype=tf.float32)
 
+# Create two graph nodes that represent tf.placeholders
+node_plac_1 = tf.placeholder(tf.float32)
+node_plac_2 = tf.placeholder(tf.float32)
+node_add_place_1 = node_plac_1 + node_plac_2
+
 ################################################################################
 ## Graph and node evaluation ways
 print("\n###### Graph and node evaluation ways ######")
@@ -77,3 +82,5 @@ with tf.Session() as sess:
         # The code below evaluates the graph that adds node_var_1 to node_var_2
         # and stores the result in node_var_1
         print(sess.run(node_var1_assign))
+
+    print(sess.run(node_add_place_1, {node_plac_1: 3, node_plac_2:4.5}))
