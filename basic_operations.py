@@ -31,7 +31,7 @@ print(node_add_1, node_add_2)
 
 # Create two graph nodes that represent tf.variables
 node_var_1 = tf.Variable(1, dtype=tf.float32)
-node_var_2 = tf.Variable(1, dtype=tf.float32)
+node_var_2 = tf.Variable(2, dtype=tf.float32)
 
 ################################################################################
 ## Graph and node evaluation ways
@@ -66,3 +66,14 @@ with tf.Session() as sess:
     print("print(node_var_1.eval()) : " + str(node_var_1.eval()))
     sess.run(node_var_1.assign(2))
     print("print(node_var_1.eval()) : " + str(node_var_1.eval()))
+
+    # Define the node for the addition of two tf.variables
+    node_add_3 = node_var_1 + node_var_1
+    print("node_add_3: " + str(node_add_3))
+
+    node_var1_assign = node_var_1.assign(node_add_3)
+
+    for i in range(5):
+        # The code below evaluates the graph that adds node_var_1 to node_var_2
+        # and stores the result in node_var_1
+        print(sess.run(node_var1_assign))
