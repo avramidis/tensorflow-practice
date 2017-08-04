@@ -123,8 +123,11 @@ with tf.Session() as sess:
 
     summary_writer.add_summary(summary, i)
 
-  print('test accuracy %g' % accuracy.eval(feed_dict={
-      x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
+
+  print('validation accuracy %g' % accuracy.eval(feed_dict={
+      x: mnist.validation.images, y_: mnist.validation.labels, keep_prob: 1.0}))
+  #print('test accuracy %g' % accuracy.eval(feed_dict={
+    #  x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
 
 end_time = time.time()
 total_time = end_time - start_time
