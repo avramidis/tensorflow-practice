@@ -14,7 +14,7 @@ start_time = time.time()
 # Parameters
 learning_rate = 1e-4
 training_epochs = 20000
-batch_size = 500
+batch_size = 50
 display_step = 100
 logs_path = 'logs'
 
@@ -96,37 +96,44 @@ with tf.name_scope('Accuracy'):
     # Model evaluation
     correct_prediction = tf.equal(tf.argmax(y_conv, 1), tf.argmax(y_, 1))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+    validation_accuracy2 = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
 # Add summary data to monitor the optimisation of the model
-tf.summary.scalar("cost", cross_entropy)
-tf.summary.scalar("accuracy", accuracy)
-merged_summary_op = tf.summary.merge_all()
+cost_sum = tf.summary.scalar("cost", cross_entropy)
+accuracy_sum = tf.summary.scalar("accuracy", accuracy)
+merged_summary_op = tf.summary.merge([cost_sum, accuracy_sum])
+#merged_summary_op = tf.summary.merge_all()
+
+validation_accuracy_sum = tf.summary.scalar("validation_accuracy", validation_accuracy2)
+merged_summary_val = tf.summary.merge([validation_accuracy_sum])
+
 print("Summary information defined.")
 
 with tf.Session() as sess:
-  sess.run(tf.global_variables_initializer())
+    sess.run(tf.global_variables_initializer())
+    summary_writer = tf.summary.FileWriter(logs_path, sess.graph)
 
-  summary_writer = tf.summary.FileWriter(logs_path, sess.graph)
+    for i in range(training_epochs):
+        batch = mnist.train.next_batch(batch_size)
 
+        if i % display_step == 0:
+            validation_accuracy = accuracy.eval(feed_dict={
+                            x: mnist.validation.images, y_: mnist.validation.labels, keep_prob: 1.0})
+            print('step %d, validation accuracy %g' % (i, validation_accuracy))
 
-  for i in range(training_epochs):
-    batch = mnist.train.next_batch(batch_size)
+            _, summary = sess.run([validation_accuracy2, merged_summary_val],
+                                    feed_dict={x: mnist.validation.images, y_: mnist.validation.labels, keep_prob: 1.0})
 
-    if i % display_step == 0:
-      train_accuracy = accuracy.eval(feed_dict={
-          x: batch[0], y_: batch[1], keep_prob: 1.0})
-      print('step %d, training accuracy %g' % (i, train_accuracy))
+            summary_writer.add_summary(summary, i)
 
-    #train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
+        _, l, summary = sess.run([train_step, cross_entropy, merged_summary_op],
+                                feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
 
-    _, l, summary = sess.run([train_step, cross_entropy, merged_summary_op], feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
+        summary_writer.add_summary(summary, i)
 
-    summary_writer.add_summary(summary, i)
-
-
-  print('validation accuracy %g' % accuracy.eval(feed_dict={
+    print('validation accuracy %g' % accuracy.eval(feed_dict={
       x: mnist.validation.images, y_: mnist.validation.labels, keep_prob: 1.0}))
-  print('test accuracy %g' % accuracy.eval(feed_dict={
+    print('test accuracy %g' % accuracy.eval(feed_dict={
       x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
 
 end_time = time.time()
