@@ -66,22 +66,26 @@ with tf.name_scope('Model'):
     h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
     h_pool2 = max_pool_2x2(h_conv2)
 
+    # Dropout
+    keep_prob = tf.placeholder(tf.float32)
+    h_fc0_drop = tf.nn.dropout(h_pool2, keep_prob)
+
     # Densely Connected Layer
     W_fc1 = weight_variable([7 * 7 * 64, 1024])
     b_fc1 = bias_variable([1024])
 
-    h_pool2_flat = tf.reshape(h_pool2, [-1, 7*7*64])
+    h_pool2_flat = tf.reshape(h_fc0_drop, [-1, 7*7*64])
     h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
     # Dropout
-    keep_prob = tf.placeholder(tf.float32)
-    h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
+    #keep_prob = tf.placeholder(tf.float32)
+    #h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
 
     # Readout Layer
     W_fc2 = weight_variable([1024, 10])
     b_fc2 = bias_variable([10])
 
-    y_conv = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
+    y_conv = tf.matmul(h_fc1, W_fc2) + b_fc2
 
 with tf.name_scope('Loss'):
     # Cost function definition
