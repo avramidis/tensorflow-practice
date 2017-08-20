@@ -12,10 +12,10 @@ import time
 start_time = time.time()
 
 # Parameters
-learning_rate = 1e-4
-training_epochs = 20000
-batch_size = 50
-display_step = 100
+learning_rate = 1e-1
+training_epochs = 60000
+batch_size = 100
+display_step = 1000
 logs_path = 'logs'
 
 # Set the logs folder and delete any files in it
@@ -67,15 +67,19 @@ with tf.name_scope('Model'):
     h_pool2 = max_pool_2x2(h_conv2)
 
     # Dropout
-    keep_prob = tf.placeholder(tf.float32)
-    h_fc0_drop = tf.nn.dropout(h_pool2, keep_prob)
+    # h_fc0_drop = tf.nn.dropout(h_pool2, keep_prob)
 
     # Densely Connected Layer
     W_fc1 = weight_variable([7 * 7 * 64, 1024])
+
+    # Dropout connect
+    keep_prob = tf.placeholder(tf.float32)
+    W_fc1_drop = tf.nn.dropout(W_fc1, keep_prob)
+
     b_fc1 = bias_variable([1024])
 
-    h_pool2_flat = tf.reshape(h_fc0_drop, [-1, 7*7*64])
-    h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
+    h_pool2_flat = tf.reshape(h_pool2, [-1, 7*7*64])
+    h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1_drop) + b_fc1)
 
     # Dropout
     #keep_prob = tf.placeholder(tf.float32)
@@ -94,7 +98,10 @@ with tf.name_scope('Loss'):
 
 with tf.name_scope('Optimiser'):
     # Model optimisation
-    train_step = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy)
+    #train_step = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy)
+    #train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(cross_entropy)
+    train_step = tf.train.AdagradOptimizer(learning_rate).minimize(cross_entropy)
+
 
 with tf.name_scope('Accuracy'):
     # Model evaluation
@@ -131,7 +138,7 @@ with tf.Session() as sess:
             summary_writer.add_summary(summary, i)
 
         _, l, summary = sess.run([train_step, cross_entropy, merged_summary_op],
-                                feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
+                                feed_dict={x: batch[0], y_: batch[1], keep_prob: 1.0})
 
         summary_writer.add_summary(summary, i)
 
