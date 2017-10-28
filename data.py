@@ -12,7 +12,6 @@ import numpy.random
 
 # from scipy.ndimage import rotate
 
-
 class Data(object):
     """
     The summary line for a class docstring should fit on one line.
@@ -36,18 +35,21 @@ class Data(object):
     test_labels = []
     """Docstring for class variable Data.test_labels"""
 
-    def __init__(self):
+    def __init__(self, train_data, train_labels, test_data, test_labels):
         """
         Default constructor.
         Sets the initial values of the object.
             :param self: Reference to the current object.
+            :param train_data: Training data.
+            :param train_labels: Training labels.
+            :param test_data: Test data.
+            :param test_labels: Test labels.
         """
 
-        self.train_data = numpy.random.rand(100, 784)
-        self.train_labels = numpy.random.rand(100, 10)
-
-        self.test_data = numpy.random.rand(10, 784)
-        self.test_labels = numpy.random.rand(10, 10)
+        self.train_data = train_data
+        self.train_labels = train_labels
+        self.test_data = test_data
+        self.test_labels = test_labels
 
     def train_random_batch(self, batch_size):
         """
@@ -62,7 +64,16 @@ class Data(object):
 
 if __name__ == "__main__":
     
-    data = Data()
+    train_data = numpy.random.rand(100, 784)
+    train_labels = numpy.random.rand(100, 10)
+    test_data = numpy.random.rand(10, 784)
+    test_labels = numpy.random.rand(10, 10)
+
+    data = Data(train_data=train_data,
+                train_labels=train_labels,
+                test_data=test_data,
+                test_labels=test_labels)
 
     batch = data.train_random_batch(2)
+
     print(batch)
