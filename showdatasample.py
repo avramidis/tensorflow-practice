@@ -27,8 +27,15 @@ from matplotlib import pyplot as plt
 
 f, axarr = plt.subplots(2, 2, sharex=False)
 img=rotate(numpy.reshape(mnist.train.images[r+0], (28, 28)), 30, reshape=False)
+
+print(img.min())
+img=img-img.min()
+print(img.min())
+
 axarr[0][0].imshow(img)
 axarr[0][0].set_title(numpy.where(mnist.train.labels[r+0]==1)[0][0])
+
+
 img=rotate(numpy.reshape(mnist.train.images[r+1], (28, 28)), 30, reshape=False)
 axarr[0][1].imshow(img)
 axarr[0][1].set_title(numpy.where(mnist.train.labels[r+1]==1)[0][0])

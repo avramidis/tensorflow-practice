@@ -13,6 +13,8 @@ from skimage.filters import threshold_mean
 from skimage.morphology import skeletonize
 from skimage.transform import radon, rescale
 
+import mnistdata
+
 start_time = time.time()
 
 # Parameters
@@ -27,9 +29,9 @@ import glob, os
 r = glob.glob(logs_path + '/*')
 for i in r:
    os.remove(i)
-
-from tensorflow.examples.tutorials.mnist import input_data
-mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
+#
+# from tensorflow.examples.tutorials.mnist import input_data
+# mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
 
 # Input variable definition and initialisation
 x = tf.placeholder(tf.float32, [None, 784], name='InputData')
@@ -57,14 +59,14 @@ with tf.name_scope('Model'):
     x_image = tf.reshape(x, [-1, 28, 28, 1])
 
     # First Convolutional Layer
-    W_conv1 = weight_variable([5, 5, 1, 128])
-    b_conv1 = bias_variable([128])
+    W_conv1 = weight_variable([5, 5, 1, 32])
+    b_conv1 = bias_variable([32])
 
     h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
     h_pool1 = max_pool_2x2(h_conv1)
 
     # Second Convolutional Layer
-    W_conv2 = weight_variable([5, 5, 128, 64])
+    W_conv2 = weight_variable([5, 5, 32, 64])
     b_conv2 = bias_variable([64])
 
     h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
@@ -124,6 +126,11 @@ merged_summary_val = tf.summary.merge([validation_accuracy_sum])
 
 print("Summary information defined.")
 
+dataset = mnistdata.mnistdata()
+mnist = dataset.mnist
+dataset.augmentdata()
+#dataset.datachange()
+
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
     summary_writer = tf.summary.FileWriter(logs_path, sess.graph)
@@ -139,7 +146,8 @@ with tf.Session() as sess:
 
             summary_writer.add_summary(summary, i)
 
-        batch = mnist.train.next_batch(batch_size)
+        #batch = mnist.train.next_batch(batch_size)
+        batch = dataset.train_next_batch(batch_size)
 
         # for b in range(batch_size):
         #     # r=rotate(numpy.reshape(batch[0][b], (28, 28)), random.randint(-15,15), reshape=False)
