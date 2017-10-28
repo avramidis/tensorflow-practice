@@ -59,7 +59,7 @@ class Data(object):
         """
 
         samples = random.sample(range(len(self.train_data)), batch_size)
-        return (self.train_data[samples, :], self.train_data[samples, :])
+        return (self.train_data[samples, :], self.train_labels[samples, :])
 
 
 if __name__ == "__main__":
