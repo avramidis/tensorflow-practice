@@ -40,32 +40,29 @@ class MnistData(Data):
     #
     #  @param self                      is the reference to the current object.
     def __init__(self):
-        # mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
-        # train_data = mnist.train.images
-        # train_labels = mnist.train.labels
-        # test_data = mnist.test.images
-        # test_labels = mnist.test.labels
-
-        #super().__init__(train_data, train_labels, test_data, test_labels)
+        """
+        Initialisation of the training and validation data.
+        Sets the initial values of the object.
+            :param self: Reference to the current object.
+        """
 
         train_data = numpy.genfromtxt(
             'train.csv', delimiter=',', skip_header=True)
         train_labels = numpy.zeros((len(train_data), 10))
+
+        print("Size of training data: ", len(train_data))
+
         for i in range(0, len(train_data)):
             train_labels[i, int(train_data[i, 0])] = 1
         train_data = train_data[:, 1:]
 
         # Split train data to test data
-        samples = random.sample(range(len(train_data)), 1000)
+        samples = random.sample(range(len(train_data)), 4200)
         test_data = train_data[samples, :]
         test_labels = train_labels[samples, :]
 
-        # test_data = numpy.genfromtxt(
-        #     'test.csv', delimiter=',', skip_header=True)
-        # test_labels = numpy.zeros((len(test_data), 10))
-        # for i in range(0, len(test_data)):
-        #     test_labels[i, int(test_data[i, 0])] = 1
-        # test_data = test_data[:, 1:]
+        train_data = numpy.delete(train_data, samples, 0)
+        train_labels = numpy.delete(train_labels, samples, 0)
 
         super().__init__(train_data, train_labels, test_data, test_labels)
 
