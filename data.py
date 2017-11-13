@@ -12,6 +12,7 @@ import numpy.random
 
 # from scipy.ndimage import rotate
 
+
 class Data(object):
     """
     The summary line for a class docstring should fit on one line.
@@ -30,24 +31,41 @@ class Data(object):
     """Docstring for class variable Data.train_data"""
     train_labels = []
     """Docstring for class variable Data.train_labels"""
+
+    validation_data = []
+    """Docstring for class variable Data.test_data"""
+    validation_labels = []
+    """Docstring for class variable Data.test_labels"""
+
     test_data = []
     """Docstring for class variable Data.test_data"""
     test_labels = []
     """Docstring for class variable Data.test_labels"""
 
-    def __init__(self, train_data, train_labels, test_data, test_labels):
+    def __init__(self,
+                 train_data,
+                 train_labels,
+                 validation_data,
+                 validation_labels,
+                 test_data, test_labels):
         """
         Default constructor.
         Sets the initial values of the object.
             :param self: Reference to the current object.
             :param train_data: Training data.
             :param train_labels: Training labels.
+            :param validation_data: Validation data.
+            :param validation_labels: Validation labels.
             :param test_data: Test data.
             :param test_labels: Test labels.
         """
 
         self.train_data = train_data
         self.train_labels = train_labels
+
+        self.validation_data = validation_data
+        self.validation_labels = validation_labels
+
         self.test_data = test_data
         self.test_labels = test_labels
 
@@ -62,18 +80,18 @@ class Data(object):
         return (self.train_data[samples, :], self.train_labels[samples, :])
 
 
-if __name__ == "__main__":
-    
-    train_data = numpy.random.rand(100, 784)
-    train_labels = numpy.random.rand(100, 10)
-    test_data = numpy.random.rand(10, 784)
-    test_labels = numpy.random.rand(10, 10)
+# if __name__ == "__main__":
 
-    data = Data(train_data=train_data,
-                train_labels=train_labels,
-                test_data=test_data,
-                test_labels=test_labels)
+#     train_data = numpy.random.rand(100, 784)
+#     train_labels = numpy.random.rand(100, 10)
+#     test_data = numpy.random.rand(10, 784)
+#     test_labels = numpy.random.rand(10, 10)
 
-    batch = data.train_random_batch(2)
+#     data = Data(train_data=train_data,
+#                 train_labels=train_labels,
+#                 test_data=test_data,
+#                 test_labels=test_labels)
 
-    print(batch)
+#     batch = data.train_random_batch(2)
+
+#     print(batch)

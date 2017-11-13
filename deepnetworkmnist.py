@@ -19,9 +19,9 @@ start_time = time.time()
 
 # Parameters
 learning_rate = 1e-4
-training_epochs = 20000
+training_epochs = 30000
 batch_size = 100
-display_step = 1000
+display_step = 2000
 logs_path = 'logs'
 
 # Set the logs folder and delete any files in it
@@ -142,9 +142,9 @@ with tf.Session() as sess:
     for i in range(training_epochs):
         if i % display_step == 0:
             print(i)
-        #     validation_accuracy = accuracy.eval(feed_dict={
-        #         x: mnist.validation.images, y_: mnist.validation.labels, keep_prob: 1.0})
-        #     print('step %d, validation accuracy %g' % (i, validation_accuracy))
+            validation_accuracy = accuracy.eval(feed_dict={
+                x: mnist.validation_data, y_: mnist.validation_labels, keep_prob: 1.0})
+            print('step %d, validation accuracy %g' % (i, validation_accuracy))
 
         #     _, summary = sess.run([validation_accuracy2, merged_summary_val],
         #                           feed_dict={x: mnist.validation.images, y_: mnist.validation.labels, keep_prob: 1.0})
@@ -172,7 +172,7 @@ with tf.Session() as sess:
     # batch[0][b]=numpy.reshape(r, (784))
 
     print('test accuracy %g' % accuracy.eval(feed_dict={
-        x: mnist.test_data, y_: mnist.test_labels, keep_prob: 1.0}))
+        x: mnist.validation_data, y_: mnist.validation_labels, keep_prob: 1.0}))
 
 end_time = time.time()
 total_time = end_time - start_time

@@ -56,15 +56,31 @@ class MnistData(Data):
             train_labels[i, int(train_data[i, 0])] = 1
         train_data = train_data[:, 1:]
 
-        # Split train data to test data
+        # Split train data to validation data
         samples = random.sample(range(len(train_data)), 4200)
-        test_data = train_data[samples, :]
-        test_labels = train_labels[samples, :]
+        validation_data = train_data[samples, :]
+        validation_labels = train_labels[samples, :]
 
         train_data = numpy.delete(train_data, samples, 0)
         train_labels = numpy.delete(train_labels, samples, 0)
 
-        super().__init__(train_data, train_labels, test_data, test_labels)
+        # Read test data
+        test_data = numpy.genfromtxt(
+            'test.csv', delimiter=',', skip_header=True)
+        test_labels = numpy.zeros((len(test_data), 10))
+
+        print("Size of test data: ", len(test_data))
+
+        for i in range(0, len(test_data)):
+            test_labels[i, int(test_data[i, 0])] = 1
+        test_data = test_data[:, 1:]
+
+        super().__init__(train_data=train_data,
+                         train_labels=train_labels,
+                         validation_data=validation_data,
+                         validation_labels=validation_labels,
+                         test_data=test_data,
+                         test_labels=test_labels)
 
     # def datachange(self):
     #     for i in range(len(self.mnist.validation.images)):
