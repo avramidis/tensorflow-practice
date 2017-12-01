@@ -82,6 +82,27 @@ class MnistData(Data):
                          test_data=test_data,
                          test_labels=test_labels)
 
+
+    def analysedata(self):
+        ri = numpy.zeros(shape=(len(self.train_data),1))
+        rl = numpy.zeros(shape=(len(self.train_data),1))
+
+        rimeans = numpy.zeros(shape=(10,1))
+        for i in range(len(self.train_data)):
+            ri[i] = numpy.sum(self.train_data[i, :])
+            rl[i] = numpy.argmax(self.train_labels[i])
+
+            rimeans[int(rl[i][0])] = rimeans[int(rl[i][0])] + ri[i]
+        
+        import matplotlib.pyplot as plt
+        # plt.hist(ri, bins='auto')
+        # plt.title("Histogram with 'auto' bins")
+        # plt.show()
+        
+        plt.plot(rimeans)
+        plt.show()
+            
+
     # def datachange(self):
     #     for i in range(len(self.mnist.validation.images)):
     #         #image = copy.deepcopy(numpy.reshape(self.mnist.validation.images[i,:], (28, 28)))
