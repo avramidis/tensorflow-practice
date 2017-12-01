@@ -47,7 +47,7 @@ class MnistData(Data):
         """
 
         train_data = numpy.genfromtxt(
-            'train.csv', delimiter=',', skip_header=True)
+            'train.csv', delimiter=',', skip_header=True)        
         train_labels = numpy.zeros((len(train_data), 10))
 
         print("Size of training data: ", len(train_data))
@@ -55,6 +55,16 @@ class MnistData(Data):
         for i in range(0, len(train_data)):
             train_labels[i, int(train_data[i, 0])] = 1
         train_data = train_data[:, 1:]
+
+        # for i in range(len(train_data)):
+        #     train_data[i, :] = train_data[i, :]/255
+        #     for j in range(784):
+        #         train_data[i, j] = train_data[i, j] + random.random()*0.1
+        #     # for j in range(784):
+        #     #     if train_data[i, j]>0.5:
+        #     #         train_data[i, j]=1
+        #     #     else:
+        #     #         train_data[i, j]=0   
 
         # Split train data to validation data
         samples = random.sample(range(len(train_data)), 4200)
@@ -86,19 +96,30 @@ class MnistData(Data):
     def analysedata(self):
         ri = numpy.zeros(shape=(len(self.train_data),1))
         rl = numpy.zeros(shape=(len(self.train_data),1))
+        
+        rc = numpy.zeros(shape=(10,1))
 
         rimeans = numpy.zeros(shape=(10,1))
         for i in range(len(self.train_data)):
+            
+            # self.train_data[i, :] = self.train_data[i, :] - numpy.mean(self.train_data[i, :])
+
             ri[i] = numpy.sum(self.train_data[i, :])
             rl[i] = numpy.argmax(self.train_labels[i])
 
             rimeans[int(rl[i][0])] = rimeans[int(rl[i][0])] + ri[i]
+
+            rc[int(rl[i][0])] = rc[int(rl[i][0])] + 1
         
         import matplotlib.pyplot as plt
         # plt.hist(ri, bins='auto')
         # plt.title("Histogram with 'auto' bins")
         # plt.show()
-        
+
+        for i in range(10):
+            rimeans[i] = rimeans[i]/rc[i]
+
+        print(rc)        
         plt.plot(rimeans)
         plt.show()
             

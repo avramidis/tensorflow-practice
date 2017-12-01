@@ -45,9 +45,9 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 start_time = time.time()
 
 # Parameters
-learning_rate = 0.0001
-training_epochs = 10000
-batch_size = 2000
+learning_rate = 1e-4
+training_epochs = 20000
+batch_size = 500
 display_step = 2000
 logs_path = 'logs'
 
@@ -58,74 +58,78 @@ for i in r:
     os.remove(i)
 
 mnist = MnistData()
-mnist.analysedata()
+#mnist.analysedata()
 
-# # Input variable definition and initialisation
-# x = tf.placeholder(tf.float32, [None, 784], name='InputData')
+# Input variable definition and initialisation
+x = tf.placeholder(tf.float32, [None, 784], name='InputData')
 
-# # Definition of the variable for the target values
-# y = tf.placeholder(tf.float32, [None, 10], name='LabelData')
+# Definition of the variable for the target values
+y = tf.placeholder(tf.float32, [None, 10], name='LabelData')
 
-# # Weights variable definition and initialisation
-# W = tf.Variable(tf.zeros([784, 10]), name='Weights')
+# Weights variable definition and initialisation
+W = tf.Variable(tf.zeros([784, 10]), name='Weights')
 
-# # Bias variable definition and initialisation
-# b = tf.Variable(tf.zeros([10]), name='Bias')
+# Bias variable definition and initialisation
+b = tf.Variable(tf.zeros([10]), name='Bias')
 
-# with tf.name_scope('Model'):
-#     # Model definition
-#     pred = tf.nn.softmax(tf.matmul(x, W) + b)  # Softmax
+with tf.name_scope('Model'):
+    # Model definition
+    pred = tf.nn.softmax(tf.matmul(x, W) + b)  # Softmax
 
-# with tf.name_scope('Loss'):
-#     # Cost function definition
-#     cost = tf.reduce_mean(
-#         tf.nn.softmax_cross_entropy_with_logits(labels=y, logits=pred))
+with tf.name_scope('Loss'):
+    # Cost function definition
+    cost = tf.reduce_mean(
+        tf.nn.softmax_cross_entropy_with_logits(labels=y, logits=pred))
 
-# with tf.name_scope('Optimiser'):
-#     # Define the optimisation algorithm
-#     #optimiser = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost)
-#     optimiser = tf.train.AdamOptimizer(learning_rate).minimize(cost)
+with tf.name_scope('Optimiser'):
+    # Define the optimisation algorithm
+    #optimiser = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost)
+    optimiser = tf.train.AdamOptimizer(learning_rate).minimize(cost)
 
-# with tf.name_scope('Accuracy'):
-#     # Model evaluation
-#     correct_prediction = tf.equal(tf.argmax(pred, 1), tf.argmax(y, 1))
-#     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+with tf.name_scope('Accuracy'):
+    # Model evaluation
+    correct_prediction = tf.equal(tf.argmax(pred, 1), tf.argmax(y, 1))
+    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
-# # Initialise the variables
-# init = tf.global_variables_initializer()
+# Initialise the variables
+init = tf.global_variables_initializer()
 
-# # Add summary data to monitor the optimisation of the model
-# tf.summary.scalar("cost", cost)
-# tf.summary.scalar("accuracy", accuracy)
-# merged_summary_op = tf.summary.merge_all()
-# print("Summary information defined.")
+# Add summary data to monitor the optimisation of the model
+tf.summary.scalar("cost", cost)
+tf.summary.scalar("accuracy", accuracy)
+merged_summary_op = tf.summary.merge_all()
+print("Summary information defined.")
 
-# with tf.Session() as sess:
-#     sess.run(init)
+with tf.Session() as sess:
+    sess.run(init)
 
-#     summary_writer = tf.summary.FileWriter(logs_path, sess.graph)
+    summary_writer = tf.summary.FileWriter(logs_path, sess.graph)
 
-#     # Train the model
-#     for i in range(training_epochs):
-#         if i % display_step == 0:
-#             validation_accuracy = accuracy.eval(feed_dict={
-#                 x: mnist.validation_data, y: mnist.validation_labels})
-#             print('step %d, validation accuracy %g' % (i, validation_accuracy))
+    # Train the model
+    for i in range(training_epochs):
+        if i % display_step == 0:
+            validation_accuracy = accuracy.eval(feed_dict={
+                x: mnist.validation_data, y: mnist.validation_labels})
+            print('step %d, validation accuracy %g' % (i, validation_accuracy))
 
-#         batch_xs, batch_ys = mnist.train_random_batch(batch_size)
+        batch_xs, batch_ys = mnist.train_random_batch(batch_size)
 
-#         _, l, summary = sess.run([optimiser, cost, merged_summary_op],
-#                                  feed_dict={x: batch_xs, y: batch_ys})
+        _, l, summary = sess.run([optimiser, cost, merged_summary_op],
+                                 feed_dict={x: batch_xs, y: batch_ys})
 
-#         summary_writer.add_summary(summary, i)
+        summary_writer.add_summary(summary, i)
 
-#     # finalaccuracy = sess.run(accuracy,
-#     #                          feed_dict={x: mnist.test_data, y: mnist.test_labels})
-#     # print("Classification accuracy for the test data set: " + str(finalaccuracy))
+    # finalaccuracy = sess.run(accuracy,
+    #                          feed_dict={x: mnist.test_data, y: mnist.test_labels})
+    # print("Classification accuracy for the test data set: " + str(finalaccuracy))
 
-# end_time = time.time()
-# total_time = end_time - start_time
-# print("Runtime: " + str(total_time) + " seconds.")
+    validation_accuracy = accuracy.eval(feed_dict={
+                x: mnist.validation_data, y: mnist.validation_labels})
+    print('step %d, fianl validation accuracy %g' % (i, validation_accuracy))
 
-# print("Enter to the command line the following: tensorboard --logdir=" + logs_path)
-# print("Using an internet browser navigate to: http://localhost:6006")
+end_time = time.time()
+total_time = end_time - start_time
+print("Runtime: " + str(total_time) + " seconds.")
+
+print("Enter to the command line the following: tensorboard --logdir=" + logs_path)
+print("Using an internet browser navigate to: http://localhost:6006")
